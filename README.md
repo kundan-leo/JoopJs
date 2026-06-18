@@ -2,7 +2,7 @@
 
 **Enterprise-grade, framework-agnostic TypeScript SDK for financial applications.**
 
-[![npm version](https://img.shields.io/badge/npm-v2.0.1-blue)](https://www.npmjs.com/package/joopjs)
+[![npm version](https://img.shields.io/badge/npm-v2.0.2-blue)](https://www.npmjs.com/package/joopjs)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-2168%20passed-success)](#)
