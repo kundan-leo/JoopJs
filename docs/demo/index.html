@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JoopJS — Interactive Playground</title>
+  <meta name="author" content="Kundan Singh" />
+  <script type="module" crossorigin src="/assets/index-DRJmoYmf.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BcbFvSqn.css">
+</head>
+<body>
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="logo">&#9670;</span>
+        <span class="brand-name">JoopJS</span>
+        <span class="brand-version" id="libVersion">v2.0.0</span>
+      </div>
+      <div class="header-tagline">Interactive SDK Playground &nbsp;·&nbsp; <span class="header-author">by Kundan Singh</span></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ── Sidebar ── -->
+    <nav class="sidebar">
+      <div class="sidebar-section-title" id="sidebarTitle">Modules</div>
+      <div class="sidebar-search">
+        <span class="search-icon">&#128269;</span>
+        <input id="moduleSearch" type="search" placeholder="Search modules…" autocomplete="off" spellcheck="false" />
+        <button class="search-clear" id="searchClear" aria-label="Clear search" hidden>&#10005;</button>
+      </div>
+      <div class="search-empty" id="searchEmpty" hidden>No modules match</div>
+      <ul class="sidebar-list" id="moduleList"></ul>
+    </nav>
+
+    <!-- ── Main ── -->
+    <main class="main">
+      <!-- Module title -->
+      <div class="module-header" id="moduleHeader" style="display:none">
+        <h2 class="module-title" id="moduleTitle"></h2>
+        <p class="module-desc" id="moduleDesc"></p>
+      </div>
+
+      <!-- Method cards -->
+      <div class="cards" id="cards"></div>
+
+      <!-- Welcome state -->
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">&#9670;</div>
+        <h2>Select a module from the sidebar</h2>
+        <p>Each module exposes its methods as interactive cards.<br/>
+           Fill in parameters and click <strong>Execute</strong> to run.</p>
+        <p style="margin-top:16px;font-size:0.8rem;opacity:0.6">
+          15 modules &nbsp;·&nbsp; 1080 tests &nbsp;·&nbsp; 35 sub-paths &nbsp;·&nbsp; React · Angular · Vue
+        </p>
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>
