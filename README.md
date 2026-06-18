@@ -11,6 +11,10 @@
 
 > Author: **Kundan Singh**
 
+**[🔗 Live Playground Demo](https://kundan-leo.github.io/JoopJs/demo/)** &nbsp;·&nbsp; **[📦 npm](https://www.npmjs.com/package/joopjs)** &nbsp;·&nbsp; **[💻 GitHub](https://github.com/kundan-leo/JoopJs)**
+
+---
+
 JoopJS provides 80+ production-ready services covering banking, finance, security, authentication, and encryption — all as plain TypeScript classes with no framework dependencies. Works with **React 18+**, **Angular 17+**, **Vue 3+**, or any plain TypeScript/JavaScript project.
 
 ---
