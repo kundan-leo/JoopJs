@@ -2,10 +2,12 @@
 
 **Enterprise-grade, framework-agnostic TypeScript SDK for financial applications.**
 
-[![npm version](https://img.shields.io/badge/npm-v2.0.0-blue)](https://www.npmjs.com/package/joopjs)
+[![npm version](https://img.shields.io/badge/npm-v2.0.1-blue)](https://www.npmjs.com/package/joopjs)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-2168%20passed-success)](#)
+[![playground](https://img.shields.io/badge/playground-live-orange)](https://kundan-leo.github.io/JoopJs/demo/)
+[![github](https://img.shields.io/badge/github-kundan--leo%2FJoopJs-black?logo=github)](https://github.com/kundan-leo/JoopJs)
 
 > Author: **Kundan Singh**
 
