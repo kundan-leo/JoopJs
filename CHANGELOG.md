@@ -8,10 +8,45 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.0] — 2026-06-25 — Angular DI & Federation-Safe Core
+
+**0 new services · 21 new tests · 2189 tests total**
+
+### Added
+- **`joopjs/angular` — real Angular 17+ DI.** Alongside the existing string tokens (kept for back-compat):
+  - `JOOP_INSTANCE` — typed `InjectionToken<JoopInstance>`, plus `provideJoopAngular()` and `injectJoop()`.
+  - `joopSignal(obs, opts?)` — bridges a `JoopObservable` to an Angular `Signal`, seeded from the current value and torn down automatically via `DestroyRef`.
+  - `joopAuthGuard(opts?)` — functional `CanActivateFn` backed by `JoopAuthService`, returning a redirect `UrlTree` when unauthenticated.
+  - `joopAuthInterceptor(opts?)` — `HttpInterceptorFn` that attaches the access token from `JoopTokenService` (configurable header/scheme).
+- **`joopjs/core` — federation-safe singletons.** `globalSingleton()`, `joopCopyCount()`, and `silenceDuplicateCopyWarning()`. Module-level singletons (`logger`, `configService`, `joopEventBus`, `clipboard`, `clientProfile`) now resolve through a version-keyed `globalThis` registry, so duplicate bundled copies in a micro-frontend converge on one instance instead of fragmenting state. A one-time console warning fires when more than one copy is detected.
+- **`setSubjectErrorHandler()`** in the events module to route subscriber errors.
+- **`scripts/check-core-boundary.mjs`** + `npm run check:boundary` — CI guard enforcing that core never imports a framework (framework imports allowed only in `angular`/`react`/`vue` sub-paths).
+
+### Changed
+- **`JoopSubject` / `JoopBehaviorSubject` emission is now error-isolated.** `next()` snapshots its listeners and wraps each in try/catch, so one throwing subscriber no longer aborts delivery to the rest, and a subscribe/unsubscribe triggered mid-emission can't disturb the in-flight notification.
+- `@angular/common` and `@angular/router` added as **optional** peer dependencies (for `joopAuthGuard` / `joopAuthInterceptor`); `tsup` externalizes them so they are never bundled.
+
+### Deprecated
+- `joopjs/angular`: the string tokens (`JOOP`, `JOOP_AUTH`, …), `provideJoop()`, `JoopModule`, and `fromJoop()` are superseded by `JOOP_INSTANCE` + `provideJoopAngular()` + `joopSignal()`. They remain functional but will be removed in a future major. (`toJoop()` is **not** deprecated — it has no signal equivalent for bringing existing RxJS streams into JoopJS.)
+
+## [2.0.6] — 2026-06-22 — Patch Release
+
+**0 new services · 0 new tests · 2168 tests total**
+
+### Fixed
+- README version badge updated from `v2.0.5` → `v2.0.6`
+
+### Notes
+- Patch bump to correctly reflect the published npm version after the 2.0.5 AI Rules Setup release.
+- All 21 smoke tests pass against the npm-published package (wallet, loans, AML, sanctions, mutual funds, GCM encryption, setup-ai files).
+
 ## Version History
 
 | Version | Codename | New Services | Tests | Total Tests | Sub-paths Added |
 |---|---|---|---|---|---|
+| [2.1.0](#210--angular-di--federation-safe-core) | Angular DI & Federation-Safe Core | — | +21 | **2189** | — |
+| [2.0.6](#206--patch-release) | Patch Release | — | — | **2168** | — |
+| [2.0.5](#205--ai-rules-setup) | AI Rules Setup | — | — | **2168** | — |
 | [2.0.0](#200--vue-composables) | Vue Composables | — | +39 | **1080** | `vue` |
 | [1.9.0](#190--banking-depth) | Banking Depth | 4 | +100 | **1041** | — |
 | [1.8.0](#180--framework-bindings) | Framework Bindings | — | +25 | 941 | `react`, `angular` |
@@ -64,6 +99,52 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 | `joopjs/react` | `createJoopReact()`, `JoopProvider`, all hooks (v1.8.0+) |
 | `joopjs/angular` | `provideJoop()`, `JoopModule`, `fromJoop()`, `toJoop()`, `createZonedFromJoop()`, all injection tokens (v1.8.0+) |
 | `joopjs/vue` | `createJoopVue()`, `provideJoop`, `useJoop`, all composables (v2.0.0+) |
+
+---
+
+## [2.0.5] — AI Rules Setup
+
+**0 new services · 0 new tests · 2168 tests total · DX release**
+
+### Added
+
+- **`npx joopjs setup-ai`** — one-command AI assistant setup for consumers. Copies joopjs-aware rules into the user's project so that Claude Code, Cursor, Windsurf, GitHub Copilot, Gemini CLI, and Codex all understand the joopjs API out of the box.
+
+- **`scripts/setup-ai.mjs`** — the setup script, published as the `joopjs` bin entry. Copies consumer-facing rules from `node_modules/joopjs/` to the correct locations in the user's project. Skips existing files by default; `--force` flag overwrites. Prints a post-install summary with the exact CLAUDE.md skill lines to add.
+
+- **`ai-rules/`** — new directory included in the npm package. Contains consumer-only versions of `GEMINI.md` and `AGENTS.md` (usage guide only, no library-dev content).
+
+- **Consumer AI rules** included in the npm package for the first time:
+  - `.claude/skills/` — 7 consumer skills: `setup`, `banking`, `finance`, `security`, `auth`, `encryption`, `observables`
+  - `.cursor/rules/joopjs.mdc` — Cursor rule (auto-applied to all `.ts` / `.tsx` / `.js` files)
+  - `.windsurf/rules/joopjs.md` — Windsurf Cascade rule
+  - `.github/copilot-instructions.md` — GitHub Copilot instructions
+  - `ai-rules/GEMINI.md` — Gemini CLI consumer guide
+  - `ai-rules/AGENTS.md` — Codex / OpenAI Agents consumer guide
+
+- **Library-dev skills** (not published to npm) — 4 new Claude Code skills for library contributors:
+  - `/dev-build` — dev environment, build commands, tsup config, dist structure
+  - `/dev-testing` — Vitest commands, test conventions, writing tests for new services
+  - `/dev-contributing` — full checklist for adding a service or sub-path, code conventions
+  - `/dev-release` — local and CI release flow, preflight checks, CHANGELOG format
+
+- **Cursor dev rules** (`.cursor/rules/dev-contributing.mdc`) and **Windsurf dev rules** (`.windsurf/rules/dev-contributing.md`) — development-focused rule files for library contributors using Cursor or Windsurf.
+
+- **`GEMINI.md`** and **`AGENTS.md`** at project root — library-dev guides for Gemini CLI and Codex contributors.
+
+### Changed
+
+- `package.json` `"files"` — extended to include `ai-rules/`, `scripts/setup-ai.mjs`, the 7 consumer Claude skills, `.cursor/rules/joopjs.mdc`, `.windsurf/rules/joopjs.md`, and `.github/copilot-instructions.md`.
+- `package.json` `"bin"` — added `"joopjs": "scripts/setup-ai.mjs"` enabling `npx joopjs setup-ai`.
+- `README.md` — added **AI Assistant Setup** section immediately after Install; npm badge updated to v2.0.5.
+
+### User workflow
+
+```bash
+npm install joopjs
+npx joopjs setup-ai           # first time
+npx joopjs setup-ai --force   # after upgrading joopjs
+```
 
 ---
 

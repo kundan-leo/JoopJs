@@ -2,10 +2,10 @@
 
 **Enterprise-grade, framework-agnostic TypeScript SDK for financial applications.**
 
-[![npm version](https://img.shields.io/badge/npm-v2.0.2-blue)](https://www.npmjs.com/package/joopjs)
+[![npm version](https://img.shields.io/badge/npm-v2.1.0-blue)](https://www.npmjs.com/package/joopjs)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
-[![tests](https://img.shields.io/badge/tests-2168%20passed-success)](#)
+[![tests](https://img.shields.io/badge/tests-2189%20passed-success)](#)
 [![playground](https://img.shields.io/badge/playground-live-orange)](https://kundan-leo.github.io/JoopJs/demo/)
 [![github](https://img.shields.io/badge/github-kundan--leo%2FJoopJs-black?logo=github)](https://github.com/kundan-leo/JoopJs)
 
@@ -17,11 +17,14 @@
 
 JoopJS provides 80+ production-ready services covering banking, finance, security, authentication, and encryption — all as plain TypeScript classes with no framework dependencies. Works with **React 18+**, **Angular 17+**, **Vue 3+**, or any plain TypeScript/JavaScript project.
 
+**New in 2.1.0:** real Angular 17+ DI in `joopjs/angular` (`provideJoopAngular`, `injectJoop`, `joopSignal`), federation-safe singletons in `joopjs/core` (`globalSingleton`, `joopCopyCount`, `silenceDuplicateCopyWarning`) for Module Federation micro-frontends, and error-isolated observable emission.
+
 ---
 
 ## Table of Contents
 
 - [Install](#install)
+- [AI Assistant Setup](#ai-assistant-setup)
 - [Quick Start](#quick-start)
 - [Service Catalogue](#service-catalogue)
   - [Banking](#banking-26-services)
@@ -57,6 +60,33 @@ pnpm add joopjs
 **Requirements:** Node.js ≥18, TypeScript ≥5.0 (optional but recommended).
 
 No mandatory peer dependencies — React / Angular / Vue bindings are opt-in.
+
+---
+
+## AI Assistant Setup
+
+JoopJS ships rules for all major AI coding tools. One command sets them up in your project:
+
+```bash
+npx joopjs setup-ai
+```
+
+This copies joopjs-aware rules so that **Claude Code**, **Cursor**, **Windsurf**, **GitHub Copilot**, **Gemini CLI**, and **Codex** all understand the joopjs API — correct imports, service patterns, observable rules, and data types.
+
+| Tool | What gets copied |
+|------|-----------------|
+| Claude Code | `.claude/skills/joopjs-*.md` — 7 skills (setup, banking, finance, security, auth, encryption, observables) |
+| Cursor | `.cursor/rules/joopjs.mdc` — auto-applied to all `.ts` / `.tsx` / `.js` files |
+| Windsurf | `.windsurf/rules/joopjs.md` — loaded by Cascade automatically |
+| GitHub Copilot | `.github/copilot-instructions.md` |
+| Gemini CLI | `GEMINI.md` |
+| Codex / OpenAI | `AGENTS.md` |
+
+```bash
+npx joopjs setup-ai --force   # overwrite after upgrading joopjs
+```
+
+> **Claude Code users:** after running, the command output shows the exact skill lines to add to your `CLAUDE.md`.
 
 ---
 
@@ -446,27 +476,33 @@ function BalanceCard({ walletId }: { walletId: string }) {
 
 ### Angular
 
+Real Angular 17+ DI. Only the `joopjs/angular` adapter imports `@angular/*` — the core SDK stays framework-agnostic.
+
 ```typescript
 // app.config.ts (standalone)
 import { ApplicationConfig } from '@angular/core';
-import { provideJoop } from 'joopjs/angular';
+import { provideJoopAngular } from 'joopjs/angular';
 import { createJoop } from 'joopjs';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideJoop(createJoop({ env: 'production', appId: 'my-app' })),
+    ...provideJoopAngular(createJoop({ env: 'production', appId: 'my-app' })),
   ],
 };
 ```
 
 ```typescript
 // component.ts
-import { inject } from '@angular/core';
-import { JOOP_AUTH } from 'joopjs/angular';
+import { injectJoop, joopSignal } from 'joopjs/angular';
+import { JoopAuthService } from 'joopjs';
 
 @Component({ ... })
 export class LoginComponent {
-  private auth = inject(JOOP_AUTH);
+  private joop = injectJoop();               // typed JoopInstance via JOOP_INSTANCE
+  private auth = new JoopAuthService();
+
+  // Bridge any JoopJS observable to an Angular signal — auto-teardown via DestroyRef
+  session = joopSignal(this.auth.session$());
 
   async login(email: string, password: string) {
     const session = await this.auth.login(email, password);
@@ -474,6 +510,8 @@ export class LoginComponent {
   }
 }
 ```
+
+> Granular injection tokens still exist, and `joopAuthGuard()` (a `CanActivateFn`) plus `joopAuthInterceptor()` (an `HttpInterceptorFn`) are available for routing and HTTP. `provideJoop()`, `JoopModule`, and `fromJoop()` are deprecated but still functional.
 
 ### Vue
 
@@ -532,6 +570,8 @@ unsub();
 ```
 
 **Critical rule:** Always use `.next(value)` to emit — **never `.emit(value)`** (that method does not exist).
+
+Emission is **error-isolated**: `next()` wraps each subscriber call in try/catch over a snapshot of its listeners, so one bad subscriber won't break the stream for the others. Route subscriber errors anywhere with `setSubjectErrorHandler` (default: `console.error`).
 
 ---
 
